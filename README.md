@@ -1,23 +1,27 @@
-# Solana pay — prototipe interaktif Figma
+# Solana pay — aplikasi web demo
 
-Versi ini memprioritaskan kecocokan visual dengan desain pemilik: 154 layar PNG 2× hasil ekspor Figma, dengan 400 tautan navigasi dari data interaksi Figma. Bukan implementasi komponen HTML penuh dan bukan layanan pembayaran.
+Implementasi HTML/CSS/JavaScript, bukan gambar dengan hotspot. Home mengikuti komposisi frame Figma: header biru, kartu ungu, layanan 4 kolom dan navigasi 5 menu. Halaman fungsional lanjutan diadaptasi, belum mereplikasi seluruh 154 frame.
 
 ## Jalankan
 ```bash
 python3 -m http.server 8099 --bind 127.0.0.1
 ```
-Buka http://127.0.0.1:8099 (perlu HTTP karena manifest dimuat melalui fetch).
+Buka http://127.0.0.1:8099.
 
-## Penggunaan
-Klik area interaktif sesuai desain. Panel pilih layar menyediakan akses semua frame, termasuk frame yang belum dihubungkan di Figma. Tombol Area klik menampilkan hotspot, Kembali mengembalikan layar sebelumnya.
+## Fitur
+- Isi saldo virtual, kirim uang virtual dan pembayaran merchant demo.
+- Validasi nominal bulat Rp10.000–Rp10.000.000 dan saldo mencukupi.
+- Konfirmasi PIN demo **123456**; batal tidak mengubah saldo.
+- Aktivitas transaksi, saldo dan nama tersimpan di localStorage.
+- Sembunyikan saldo, edit nama, reset demo dengan konfirmasi.
+- Buat teks permintaan uang tanpa mengirim pesan otomatis.
+- Simulasi tagihan PLN, TV kabel, pulsa dan pajak.
 
 ## Batasan
-- Teks, saldo, formulir dan angka adalah gambar desain statis, bukan input atau saldo dinamis.
-- Tidak melakukan login, pembayaran, pengiriman uang, pemindaian QR, atau komunikasi bank.
-- Tidak boleh memasukkan data pribadi/keuangan asli.
-- Layar mengikuti ukuran Figma 402×874 dan diperkecil proporsional di ponsel.
-- File css/style.css dan js/app.js lama tidak dipakai halaman ini; dipertahankan agar implementasi demo lama tidak hilang.
-- Token Figma dan JSON dokumen mentah tidak disertakan dalam repositori.
+Tidak ada uang asli, bank, QR scanner, blockchain, backend, autentikasi sungguhan, investasi atau pembayaran tagihan nyata. PIN client-side bukan fitur keamanan produksi. Data browser dapat diubah lewat DevTools. Jangan memasukkan data asli. Layanan yang belum terhubung ditandai jelas.
 
-## Pengujian
-Browser Chromium: 154 pilihan layar, navigasi Home → Kirim uang → Home berhasil; viewport 360px tanpa overflow horizontal; tidak ada JavaScript page error.
+## File aktif
+index.html, wallet.css, wallet.js. File prototype dan ekspor Figma lama dipertahankan sebagai referensi, tidak dimuat aplikasi.
+
+## Tes
+Chromium: topup, PIN salah, transfer, pembatalan, riwayat, persistensi setelah reload, mobile 360px tanpa overflow dan tanpa JS error.
