@@ -1,51 +1,23 @@
-# Dompetin — e-Wallet (frontend demo)
+# Solana pay — prototipe interaktif Figma
 
-Aplikasi dompet digital versi frontend. Semua alur jalan tanpa backend: saldo,
-transaksi, dan PIN disimulasikan di browser dengan `localStorage`.
+Versi ini memprioritaskan kecocokan visual dengan desain pemilik: 154 layar PNG 2× hasil ekspor Figma, dengan 400 tautan navigasi dari data interaksi Figma. Bukan implementasi komponen HTML penuh dan bukan layanan pembayaran.
 
-## Menjalankan
-
+## Jalankan
 ```bash
-cd ewallet
-python3 -m http.server 8099
-# buka http://localhost:8099
+python3 -m http.server 8099 --bind 127.0.0.1
 ```
+Buka http://127.0.0.1:8099 (perlu HTTP karena manifest dimuat melalui fetch).
 
-Tidak butuh build step, tidak butuh dependency. Cukup buka `index.html`
-langsung juga bisa (kecuali kalau mau tes di HP lewat jaringan lokal).
+## Penggunaan
+Klik area interaktif sesuai desain. Panel pilih layar menyediakan akses semua frame, termasuk frame yang belum dihubungkan di Figma. Tombol Area klik menampilkan hotspot, Kembali mengembalikan layar sebelumnya.
 
-## Struktur
+## Batasan
+- Teks, saldo, formulir dan angka adalah gambar desain statis, bukan input atau saldo dinamis.
+- Tidak melakukan login, pembayaran, pengiriman uang, pemindaian QR, atau komunikasi bank.
+- Tidak boleh memasukkan data pribadi/keuangan asli.
+- Layar mengikuti ukuran Figma 402×874 dan diperkecil proporsional di ponsel.
+- File css/style.css dan js/app.js lama tidak dipakai halaman ini; dipertahankan agar implementasi demo lama tidak hilang.
+- Token Figma dan JSON dokumen mentah tidak disertakan dalam repositori.
 
-```
-index.html        markup layar utama + shell modal
-css/style.css     seluruh styling (token warna di :root)
-js/app.js         state, render, dan semua alur transaksi
-```
-
-## Yang sudah jalan
-
-| Fitur | Status |
-|---|---|
-| Lihat saldo + sembunyikan saldo | jalan |
-| Top Up (nominal cepat / manual) | jalan, saldo bertambah |
-| Transfer (pilih kontak → nominal → PIN) | jalan, saldo berkurang, validasi saldo |
-| Tarik tunai | jalan |
-| QRIS | simulasi (belum ada merchant asli) |
-| Riwayat transaksi | jalan, tersimpan setelah refresh |
-| Profil + reset data demo | jalan |
-
-PIN di mode demo menerima angka apa pun. Verifikasi PIN yang benar **harus**
-di server, bukan di browser.
-
-## Yang belum ada (sengaja)
-
-- Backend. Saldo disimpan di `localStorage`, jadi bisa diubah siapa pun yang
-  buka DevTools. Untuk uang sungguhan, saldo dan mutasi wajib di server.
-- Autentikasi, session, dan enkripsi.
-- QRIS asli (butuh integrasi payment gateway).
-
-## Menyesuaikan dengan desain Figma
-
-Semua warna, radius, dan bayangan ada di blok `:root` pada `css/style.css`.
-Ganti variabel di sana, dan hampir seluruh tampilan ikut berubah tanpa
-menyentuh markup.
+## Pengujian
+Browser Chromium: 154 pilihan layar, navigasi Home → Kirim uang → Home berhasil; viewport 360px tanpa overflow horizontal; tidak ada JavaScript page error.
