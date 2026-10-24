@@ -5,7 +5,8 @@ main{padding-bottom:110px}
 .hero-bg{background:#5CA1ED;padding:22px 20px 0;position:relative}
 .hero-bg::after{content:'';position:absolute;bottom:-70px;left:-40px;width:140%;height:150px;background:#fff;border-radius:50%;z-index:1}
 .hero-top{display:flex;align-items:center;gap:10px;position:relative;z-index:2}
-.avatar{width:38px;height:38px;border-radius:50%;background:#e5e0ff;display:grid;place-items:center;color:#514283;font-weight:700;font-size:14px;flex-shrink:0}
+.avatar{width:38px;height:38px;border-radius:50%;background:#e5e0ff;display:grid;place-items:center;color:#514283;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .greet{color:#fff;font-size:11px;line-height:1.35}
 .greet b{font-size:13px;font-weight:600;display:block;margin-top:1px}
 .brand{margin-left:auto;background:#8274EA;padding:6px 14px;border-radius:8px;color:#fff;font-size:14px;font-weight:600;letter-spacing:-.4px}
@@ -30,10 +31,13 @@ main{padding-bottom:110px}
 .contact-btn .avatar{background:#e4d9f2}
 .rekomendasi{padding:22px 20px}
 .rekomendasi h2{font-size:16px;font-weight:500;margin-bottom:14px}
+.banner-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:20px 20px 4px}
+.banner-scroll::-webkit-scrollbar{display:none}
+.banner-img{flex:0 0 362px;width:362px;height:181px;object-fit:cover;border-radius:12px;scroll-snap-align:center;box-shadow:0 3px 12px #00000018}
 .promo-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
 .promo-scroll::-webkit-scrollbar{display:none}
 .promo-card{flex:0 0 154px;scroll-snap-align:start;border-radius:10px;overflow:hidden;background:#f3f0ff;box-shadow:0 2px 8px #0000000f}
-.promo-img{height:104px;background:linear-gradient(135deg,#8274EA,#5CA1ED);display:grid;place-items:center;color:#fff;font-size:30px}
+.promo-img{width:154px;height:104px;object-fit:cover;display:block;background:#e7e2fb}
 .promo-card p{padding:10px;font-size:13px;line-height:1.4;font-weight:500}
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:402px;background:#fff;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -3px 12px #00000014;padding:8px 0 max(12px,env(safe-area-inset-bottom));z-index:10}
 nav button{background:0 0;font-size:10px;color:#888;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0}

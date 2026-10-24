@@ -35,6 +35,29 @@ const ICON = {
 };
 const svg = (name, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
 
+/* ---------- gambar asli dari Figma ---------- */
+const IMG = {
+  logo: 'assets/img/55c81d4ce32b4c18a6ce061ca4b87708e505eb86.webp',
+  nav: 'assets/img/ae9940a3136311f24739d93e81a24cf9a8f36c8a.webp',
+  avatars: [
+    'assets/img/7a22723e49991f8f7ae9280a0c291b61cfc689c0.webp',
+    'assets/img/0c224d25730fd376b5c34e113a616646975b68ea.webp',
+    'assets/img/9f1e53ae23afc5a897c7e2ba63f44267274645b1.webp',
+    'assets/img/c204717c7659ac81c73c1a523a260e512299ad38.webp',
+  ],
+  banners: [
+    'assets/img/b6ea9a1437322c63b53bc26ddf8ed18ecdd3035c.webp',
+    'assets/img/206401719c19646aae809c25828caffb485920bc.webp',
+    'assets/img/6a12477090af3fd05049eb954636610c911303ea.webp',
+  ],
+  promos: [
+    'assets/img/4f4fa6b5f91403de67bbdc5ca1e6c6b0befe181e.webp',
+    'assets/img/30331acaedd1c5c92bbf0c99854132c9e6f1a961.webp',
+    'assets/img/0789635f1e0acfd07f16fa237b9ecf6dadc4c19d.webp',
+    'assets/img/0f2305a588a4c1e9b65f49ef63a250681ab80e6f.webp',
+  ],
+};
+
 /* ---------- util ---------- */
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); return true; } catch { toast('Penyimpanan browser penuh.'); return false; } }
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3000); }
@@ -71,7 +94,7 @@ function home() {
   const promos = [['Promo Bulan ini', 'Ada QRIS, ada Solanapay, ada promo!'], ['Promo Online', 'Spesial beli pulsa dapat potongan ekstra'], ['Promo Terbatas', 'Raih Rp100 juta Solana Point modal topup'], ['Cashback', 'Staking saldo dan dapat cashback hingga 5%']];
   return `<section class="hero"><div class="hero-bg">
     <div class="hero-top">
-      <span class="avatar">${esc(state.name.slice(0, 1).toUpperCase())}</span>
+      <span class="avatar"><img src="${IMG.logo}" alt="" width="38" height="38"></span>
       <span class="greet">Selamat malam,<b>${esc(state.name)}</b></span>
       <span class="brand">Solanapay</span>
     </div>
@@ -93,8 +116,9 @@ function home() {
     </div></div>
   </div></section>
   <section class="services">${services.map(([n, i]) => `<button class="svc" data-service="${n}"><span class="svc-icon">${svg(i)}</span>${n}</button>`).join('')}</section>
-  <div class="contacts-strip">${contacts.map((c, i) => `<button class="contact-btn" data-contact="${c}"><span class="avatar">${'ADRM'[i]}</span>${c}</button>`).join('')}</div>
-  <section class="rekomendasi"><h2>Rekomendasi Pilihan</h2><div class="promo-scroll">${promos.map(([t, d]) => `<article class="promo-card"><div class="promo-img">${svg('bolt')}</div><p><strong style="font-size:13px">${t}</strong><br>${d}</p></article>`).join('')}</div></section>`;
+  <div class="contacts-strip">${contacts.map((c, i) => `<button class="contact-btn" data-contact="${c}"><span class="avatar"><img src="${IMG.avatars[i]}" alt="" width="38" height="38"></span>${c}</button>`).join('')}</div>
+  <div class="banner-scroll">${IMG.banners.map((b, i) => `<img class="banner-img" src="${b}" alt="Banner promo ${i + 1}" width="362" height="181" loading="lazy">`).join('')}</div>
+  <section class="rekomendasi"><h2>Rekomendasi Pilihan</h2><div class="promo-scroll">${promos.map(([t, d], i) => `<article class="promo-card"><img class="promo-img" src="${IMG.promos[i]}" alt="" width="154" height="104" loading="lazy"><p><strong style="font-size:13px">${t}</strong><br>${d}</p></article>`).join('')}</div></section>`;
 }
 
 const NAV = [['home', 'home', 'Beranda'], ['activity', 'receipt', 'Aktivitas'], ['qris', 'qr', ''], ['wallet', 'wallet', 'Dompet'], ['profile', 'user', 'Saya']];
