@@ -89,3 +89,47 @@ dialog p{margin-bottom:14px;font-size:13px;color:#575269;line-height:1.5}
 .profile-card{text-align:center;padding:16px 0 6px}
 .profile-card .avatar{width:64px;height:64px;font-size:24px;margin:0 auto 12px}
 @media(min-width:500px){body{padding:20px}.phone{border-radius:20px;overflow:clip;box-shadow:0 12px 50px #29204922;min-height:874px}}
+
+/* ================= SPLASH: tampilan awal ================= */
+[hidden]{display:none!important}
+.splash{position:fixed;inset:0;background:#8274EA;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:60;transition:opacity .45s ease,transform .45s ease}
+.splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.splash-mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 32px}
+.splash-hi{color:#fff;font-size:15px;font-weight:600;letter-spacing:.16em;opacity:0;animation:upIn .6s cubic-bezier(.2,.8,.2,1) .25s forwards}
+.splash-brand{color:#fff;font-size:40px;font-weight:700;letter-spacing:-1.4px;margin-top:10px;opacity:0;transform:scale(.86);animation:brandIn .75s cubic-bezier(.2,1.1,.3,1) .55s forwards}
+.splash-brand em{font-style:italic;font-weight:600;letter-spacing:-.5px}
+.splash-foot{padding-bottom:64px;text-align:center;opacity:0;animation:upIn .6s ease 1s forwards}
+.splash-support{color:#fff;font-size:11px;letter-spacing:.14em;font-weight:500;margin-bottom:12px}
+.splash-pill{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#111;font-size:13px;font-weight:700;letter-spacing:.06em;padding:9px 20px;border-radius:999px;box-shadow:0 8px 24px #0000001f}
+.splash-pill svg{width:20px;height:17px}
+@keyframes upIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes brandIn{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+
+/* ================= KUNCI PIN ================= */
+.lock{position:fixed;inset:0;background:#fff;z-index:50;display:flex;flex-direction:column;animation:slideUp .42s cubic-bezier(.2,.9,.25,1) both}
+.lock.out{animation:slideOut .35s ease forwards}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes slideOut{to{transform:translateY(-14%);opacity:0}}
+.lock-head{background:#7B6FF0;color:#fff;padding:18px 20px 20px;display:flex;align-items:center;gap:8px}
+.lock-head h1{font-size:17px;font-weight:600;flex:1;text-align:center;margin-right:28px}
+#lockBack{background:none;border:0;color:#fff;font-size:30px;line-height:1;width:28px;height:28px;cursor:pointer;display:grid;place-items:center;padding-bottom:4px}
+.lock-body{flex:1;display:flex;flex-direction:column;align-items:center;padding:26px 24px 22px}
+.lock-icon{width:96px;height:96px;border-radius:50%;background:#f1effa;color:#8274EA;display:grid;place-items:center;margin-bottom:18px;animation:pop .45s cubic-bezier(.2,1.2,.3,1) .12s both}
+.lock-icon svg{width:42px;height:42px}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.lock-text{font-size:13px;color:#3b3550;text-align:center;max-width:250px;line-height:1.55;margin-bottom:22px}
+.lock-dots{display:flex;gap:16px;margin-bottom:6px}
+.lock-dots i{width:13px;height:13px;border-radius:50%;background:#d9d6e4;transition:background .18s,transform .18s}
+.lock-dots i.on{background:#8274EA;animation:dotPop .22s ease}
+@keyframes dotPop{0%{transform:scale(1)}45%{transform:scale(1.45)}100%{transform:scale(1)}}
+.lock-dots.shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}
+.lock-dots.shake i{background:#e0566f}
+@keyframes shake{10%,90%{transform:translateX(-4px)}20%,80%{transform:translateX(7px)}30%,50%,70%{transform:translateX(-10px)}40%,60%{transform:translateX(10px)}}
+.lock-error{color:#d13b57;font-size:12px;min-height:18px;margin-top:12px}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:300px;margin-top:auto}
+.keypad button{height:56px;border:0;border-radius:14px;background:#f5f3fb;color:#242136;font-size:22px;font-weight:500;cursor:pointer;transition:background .12s,transform .1s;font-family:inherit}
+.keypad button:active{background:#e3ddfa;transform:scale(.96)}
+.keypad .key-del{display:grid;place-items:center;color:#8274EA}
+.keypad .key-del svg{width:24px;height:24px}
+.lock-hint{font-size:11px;color:#a6abc0;margin-top:16px}
+.lock-hint b{color:#8274EA}

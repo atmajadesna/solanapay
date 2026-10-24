@@ -212,4 +212,76 @@ document.addEventListener('click', (e) => {
   if (c) { go('transfer'); const t = $('#target'); if (t) t.value = c.dataset.contact; }
 });
 
+/* ================= boot: splash -> PIN -> aplikasi ================= */
+const DEMO_PIN = '123456';
+let pinBuf = '';
+
+const paintDots = () => [...$('#lockDots').children].forEach((d, i) => d.classList.toggle('on', i < pinBuf.length));
+
+function showApp() {
+  $('#shell').hidden = false;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function startLock() {
+  const lock = $('#lock');
+  lock.hidden = false;
+  pinBuf = '';
+  paintDots();
+  $('#lockError').textContent = '';
+}
+
+function unlock() {
+  const lock = $('#lock');
+  lock.classList.add('out');
+  setTimeout(() => {
+    lock.hidden = true;
+    lock.classList.remove('out');
+    showApp();
+  }, 340);
+}
+
+function checkPin() {
+  if (pinBuf === DEMO_PIN) { unlock(); return; }
+  const dots = $('#lockDots');
+  dots.classList.add('shake');
+  $('#lockError').textContent = 'PIN salah, coba lagi';
+  setTimeout(() => {
+    dots.classList.remove('shake');
+    pinBuf = '';
+    paintDots();
+  }, 620);
+}
+
+$('#keypad').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-key]');
+  if (!b) return;
+  const k = b.dataset.key;
+  if (k === 'del') { pinBuf = pinBuf.slice(0, -1); $('#lockError').textContent = ''; paintDots(); return; }
+  if (pinBuf.length >= 6) return;
+  pinBuf += k;
+  paintDots();
+  if (pinBuf.length === 6) setTimeout(checkPin, 130);
+});
+
+$('#lockBack').addEventListener('click', () => {
+  pinBuf = '';
+  paintDots();
+  $('#lockError').textContent = '';
+});
+
+document.addEventListener('keydown', (e) => {
+  if ($('#lock').hidden) return;
+  if (/^[0-9]$/.test(e.key)) { pinBuf.length < 6 && (pinBuf += e.key, paintDots(), pinBuf.length === 6 && setTimeout(checkPin, 130)); }
+  else if (e.key === 'Backspace') { pinBuf = pinBuf.slice(0, -1); paintDots(); }
+});
+
 render();
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    $('#splash').classList.add('out');
+    setTimeout(() => { $('#splash').hidden = true; startLock(); }, 430);
+  }, 1900);
+});

@@ -1,1 +1,96 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#8274EA"><title>Solanapay</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><link rel="stylesheet" href="wallet.css?v=3"></head><body><div class="phone"><main id="app"></main><nav id="nav"></nav></div><dialog id="confirm"><form method="dialog"><h2>Konfirmasi transaksi</h2><p id="summary"></p><label>PIN<input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Masukkan PIN"></label><p id="pinError" role="alert"></p><div class="row"><button value="cancel">Batal</button><button type="button" id="approve" class="primary">Konfirmasi</button></div></form></dialog><div id="toast" role="status" hidden></div><script src="wallet.js?v=3"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#8274EA">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Solanapay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wallet.css?v=4">
+</head>
+<body>
+
+<!-- ============ SPLASH: tampilan awal ============ -->
+<div id="splash" class="splash">
+  <div class="splash-mid">
+    <p class="splash-hi">SELAMAT DATANG DI</p>
+    <p class="splash-brand">Solana<em>pay</em></p>
+  </div>
+  <div class="splash-foot">
+    <p class="splash-support">SUPPORT BY:</p>
+    <span class="splash-pill">
+      <svg viewBox="0 0 24 20" aria-hidden="true">
+        <defs><linearGradient id="sol" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#00FFA3"/><stop offset=".55" stop-color="#03E1FF"/><stop offset="1" stop-color="#DC1FFF"/>
+        </linearGradient></defs>
+        <g fill="url(#sol)">
+          <path d="M4.6 0h17.8l-4.4 4.3H0z"/>
+          <path d="M0 7.8h17.8L22.4 12H4.6z"/>
+          <path d="M4.6 15.6h17.8l-4.4 4.3H0z"/>
+        </g>
+      </svg>SOLANA</span>
+  </div>
+</div>
+
+<!-- ============ KUNCI PIN ============ -->
+<div id="lock" class="lock" hidden>
+  <header class="lock-head">
+    <button id="lockBack" type="button" aria-label="Kembali">&#8249;</button>
+    <h1>PIN Transaksi</h1>
+  </header>
+  <div class="lock-body">
+    <span class="lock-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="10.5" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M8 10.5V7.4a4 4 0 0 1 8 0v3.1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+      </svg>
+    </span>
+    <p class="lock-text">Gunakan PIN untuk mengamankan transaksi Anda</p>
+    <div class="lock-dots" id="lockDots" role="status" aria-label="6 digit PIN">
+      <i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <p class="lock-error" id="lockError" role="alert"></p>
+    <div class="keypad" id="keypad">
+      <button type="button" data-key="1">1</button>
+      <button type="button" data-key="2">2</button>
+      <button type="button" data-key="3">3</button>
+      <button type="button" data-key="4">4</button>
+      <button type="button" data-key="5">5</button>
+      <button type="button" data-key="6">6</button>
+      <button type="button" data-key="7">7</button>
+      <button type="button" data-key="8">8</button>
+      <button type="button" data-key="9">9</button>
+      <span></span>
+      <button type="button" data-key="0">0</button>
+      <button type="button" data-key="del" class="key-del" aria-label="Hapus">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9L3 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.5l4 4M16 9.5l-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <p class="lock-hint">PIN demo: <b>123456</b></p>
+  </div>
+</div>
+
+<!-- ============ APLIKASI ============ -->
+<div class="phone" id="shell" hidden>
+  <main id="app"></main>
+  <nav id="nav"></nav>
+</div>
+
+<dialog id="confirm">
+  <form method="dialog">
+    <h2>Konfirmasi transaksi</h2>
+    <p id="summary"></p>
+    <label>PIN<input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Masukkan PIN"></label>
+    <p id="pinError" role="alert"></p>
+    <div class="row"><button value="cancel">Batal</button><button type="button" id="approve" class="primary">Konfirmasi</button></div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" hidden></div>
+<script src="wallet.js?v=4"></script>
+</body>
+</html>
