@@ -1,4 +1,4 @@
-# Solana pay — aplikasi web demo
+# Solanapay — aplikasi dompet digital (demo)
 
 Implementasi HTML/CSS/JavaScript, bukan gambar dengan hotspot. Home mengikuti komposisi frame Figma: header biru, kartu ungu, layanan 4 kolom dan navigasi 5 menu. Halaman fungsional lanjutan diadaptasi, belum mereplikasi seluruh 154 frame.
 
@@ -7,6 +7,8 @@ Implementasi HTML/CSS/JavaScript, bukan gambar dengan hotspot. Home mengikuti ko
 python3 -m http.server 8099 --bind 127.0.0.1
 ```
 Buka http://127.0.0.1:8099.
+
+Demo live: https://atmajadesna.github.io/solanapay/
 
 ## Fitur
 - Isi saldo virtual, kirim uang virtual dan pembayaran merchant demo.

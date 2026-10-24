@@ -1,52 +1,191 @@
 'use strict';
-const KEY='solanapay.app.v1', $=s=>document.querySelector(s), fmt=n=>Math.round(n).toLocaleString('id-ID'), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const seed=()=>({name:'Masboy',balance:150000000,points:4500,hidden:false,transactions:[]});
-let state;try{state=JSON.parse(localStorage.getItem(KEY));if(!state||!Number.isSafeInteger(state.balance)||state.balance<0||!Array.isArray(state.transactions))state=seed();}catch{state=seed();}
-let route='home',pending=null;
-const navs=[['home','≋','Beranda'],['activity','▤','Aktivitas'],['qris','▦','QRIS'],['wallet','▣','Dompet'],['profile','◉','Saya']];
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));return true;}catch{toast('Penyimpanan browser penuh/tidak tersedia.');return false;}}
-function toast(t){$('#toast').textContent=t;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,3000);}
-function page(title,html){return `<section class="page"><button class="back" data-go="home" aria-label="Kembali">←</button><h1>${title}</h1>${html}</section>`;}
-function go(to){route=to;render();window.scrollTo(0,0);}
-function transactions(){return state.transactions.length?state.transactions.map(t=>`<div class="item"><span class="avatar">${t.amount>0?'↓':'↑'}</span><div class="meta"><strong>${esc(t.title)}</strong><small>${new Date(t.date).toLocaleString('id-ID')}</small></div><strong class="${t.amount>0?'positive':'negative'}">${t.amount>0?'+':'−'}${fmt(Math.abs(t.amount))}</strong></div>`).join(''):'<p class="empty">Belum ada transaksi. Coba isi saldo virtual.</p>';}
-const services=[['KUA','♧'],['Pln','ϟ'],['Tv kabel','▣'],['Proteksi','◇'],['Investasi','↗'],['Pulsa','▯'],['Pajak','▤'],['Lainya','•••']];
-function home(){return `<section class="hero"><div class="logo">≋</div><div class="greeting"><span class="avatar">${esc(state.name.slice(0,1))}</span><span><small>Selamat malam,</small><br><b>${esc(state.name)}</b></span><span class="brand">Solana <i>pay</i></span></div><div class="balance"><div class="balance-inner"><small>Total saldo anda</small><div class="money"><small>Rp</small><span id="balanceValue">${state.hidden?'••••••••':fmt(state.balance)}</span><button class="eye" id="toggle" aria-label="Sembunyikan saldo">◉</button></div><div class="points">${fmt(state.points)} point</div></div><div class="quick">${[['topup','+','Isi saldo'],['request','↓','Minta'],['transfer','⇄','Kirim'],['messages','✉','Pesan']].map(([r,i,n])=>`<button data-go="${r}"><b>${i}</b>${n}</button>`).join('')}</div></div></section><section class="services">${services.map(([n,i])=>`<button class="service" data-service="${n}"><b>${i}</b>${n}</button>`).join('')}</section><div class="contacts">${['345','505','433','453'].map((n,i)=>`<button data-contact="+62${n}"><span class="avatar">${['A','D','R','M'][i]}</span>+62${n}</button>`).join('')}</div><div class="promo">Transaksi mudah setiap hari<small>Semua transaksi di aplikasi ini menggunakan uang virtual.</small></div>`;}
-function moneyForm(kind,target=''){
- const top=kind==='topup', qr=kind==='qris', bill=kind==='bill';
- return `<p class="notice">Simulasi saja. Tidak ada dana sungguhan yang dikirim atau ditagih.</p><form id="moneyForm" data-kind="${kind}">${top?'<label>Metode isi saldo<select id="target"><option>Bank BCA (demo)</option><option>Bank Mandiri (demo)</option><option>Indomaret (demo)</option></select></label>':`<label>${qr?'Nama merchant demo':bill?'Nomor pelanggan demo':'Nomor/nama penerima demo'}<input id="target" required maxlength="50" placeholder="${qr?'Warung Demo':'Contoh: 081234567890'}" value="${esc(target)}"></label>`}<label>Nominal (Rp)<input id="amount" type="number" inputmode="numeric" min="10000" max="10000000" step="1" required placeholder="Minimal 10.000"></label><div class="chips">${[10000,50000,100000,500000].map(n=>`<button type="button" data-amount="${n}">${fmt(n)}</button>`).join('')}</div><p class="muted">Saldo virtual: Rp ${fmt(state.balance)} • Maksimal Rp10.000.000/transaksi</p><p class="error" id="formError" role="alert"></p><button class="primary" type="submit">${top?'Isi saldo virtual':qr?'Bayar virtual':'Lanjutkan'}</button></form>`;
-}
-function render(){
- $('#nav').innerHTML=navs.map(([r,i,n])=>`<button data-go="${r}" class="${r===route?'active ':''}${r==='qris'?'scan':''}"><b>${i}</b>${n}</button>`).join('');
- let h;
- if(route==='home')h=home();
- else if(route==='topup')h=page('Isi saldo',moneyForm('topup'));
- else if(route==='transfer')h=page('Kirim uang',moneyForm('transfer'));
- else if(route==='qris')h=page('Pembayaran QRIS',`<p class="notice">Pemindaian QR belum terhubung penyedia QRIS. Form ini hanya simulasi pembayaran merchant.</p>${moneyForm('qris')}`);
- else if(route==='activity')h=page('Aktivitas',transactions());
- else if(route==='wallet')h=page('Dompet',`<div class="balance"><div class="balance-inner"><small>Total saldo virtual</small><p class="big">Rp ${fmt(state.balance)}</p></div></div><button class="listbutton" data-go="topup">Isi saldo <span>→</span></button><button class="listbutton" data-go="transfer">Kirim uang <span>→</span></button><button class="listbutton" data-go="activity">Riwayat transaksi <span>→</span></button>`);
- else if(route==='profile')h=page('Saya',`<span class="avatar">${esc(state.name.slice(0,1))}</span><form id="profileForm"><label>Nama tampilan<input id="name" maxlength="30" required value="${esc(state.name)}"></label><button class="primary">Simpan nama</button></form><p class="notice">PIN demo: 123456. Jangan gunakan PIN atau data pribadi asli. Data hanya disimpan pada browser ini.</p><button class="listbutton" id="reset">Reset data demo <span>↺</span></button>`);
- else if(route==='request')h=page('Minta uang',`<p class="notice">Buat pesan permintaan uang virtual. Tidak mengirim pesan ke siapa pun secara otomatis.</p><form id="requestForm"><label>Nominal<input id="requestAmount" type="number" min="10000" max="10000000" required></label><button class="primary">Buat permintaan</button></form><p id="requestResult"></p>`);
- else if(route==='messages')h=page('Pesan',`<p class="notice">Notifikasi transaksi demo</p>${transactions()}`);
- else if(route.startsWith('service:')){const name=route.slice(8);h=page(esc(name),['Pln','Tv kabel','Pulsa','Pajak'].includes(name)?moneyForm('bill'):`<p class="notice">${esc(name)} belum terhubung layanan eksternal. Tidak ada pendaftaran, investasi, atau pembayaran sungguhan.</p><button class="primary" data-go="home">Kembali ke beranda</button>`);}
- else h=home();
- $('#app').innerHTML=h;
- const f=$('#moneyForm');if(f)f.addEventListener('submit',prepare);
- $('#profileForm')?.addEventListener('submit',e=>{e.preventDefault();const n=$('#name').value.trim();if(!n)return;state.name=n;save();toast('Nama diperbarui');go('profile');});
- $('#requestForm')?.addEventListener('submit',e=>{e.preventDefault();$('#requestResult').textContent=`${state.name} meminta Rp ${fmt(Number($('#requestAmount').value))} (permintaan demo, belum dikirim).`;});
- $('#toggle')?.addEventListener('click',()=>{state.hidden=!state.hidden;save();render();});
- $('#reset')?.addEventListener('click',()=>{if(window.confirm('Reset saldo dan hapus riwayat demo pada browser ini?')){state=seed();save();go('home');}});
-}
-function prepare(e){e.preventDefault();const amount=Number($('#amount').value),target=$('#target').value.trim(),kind=e.target.dataset.kind;
- if(!Number.isSafeInteger(amount)||amount<10000||amount>10000000||!target){$('#formError').textContent='Isi penerima dan nominal bulat Rp10.000–Rp10.000.000.';return;}
- if(kind!=='topup'&&amount>state.balance){$('#formError').textContent='Saldo tidak cukup.';return;}
- pending={amount,target,kind,service:route.startsWith('service:')?route.slice(8):null};$('#summary').textContent=`${kind==='topup'?'Isi saldo':'Bayar/kirim'} Rp ${fmt(amount)} · ${target}`;$('#pin').value='';$('#pinError').textContent='';$('#confirm').showModal();
-}
-$('#approve').onclick=()=>{
- if(!pending)return;if($('#pin').value!=='123456'){$('#pinError').textContent='PIN demo salah. Gunakan 123456.';return;}
- const p=pending;if(p.kind!=='topup'&&p.amount>state.balance){$('#pinError').textContent='Saldo tidak cukup.';return;}
- const title=p.kind==='topup'?`Isi saldo · ${p.target}`:p.kind==='qris'?`QRIS · ${p.target}`:p.kind==='bill'?`${p.service} · ${p.target}`:`Kirim · ${p.target}`;
- const signed=p.kind==='topup'?p.amount:-p.amount;state.balance+=signed;state.transactions.unshift({id:crypto.randomUUID(),title,amount:signed,date:new Date().toISOString()});state.transactions=state.transactions.slice(0,200);save();pending=null;$('#confirm').close();$('#app').innerHTML=page('Transaksi berhasil',`<div class="success"><div class="check">✓</div><p class="big">Rp ${fmt(p.amount)}</p><p>${esc(title)}</p><p class="muted">Simulasi selesai. Tidak ada uang sungguhan berpindah.</p><button class="primary" data-go="activity">Lihat aktivitas</button></div>`);window.scrollTo(0,0);
+const KEY = 'solanapay.v2';
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => Math.round(n).toLocaleString('id-ID');
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const seed = () => ({ name: 'Masboy', balance: 150000000, points: 4500, hidden: false, tx: [] });
+let state;
+try {
+  state = JSON.parse(localStorage.getItem(KEY));
+  if (!state || !Number.isSafeInteger(state.balance) || state.balance < 0 || !Array.isArray(state.tx)) state = seed();
+} catch { state = seed(); }
+
+let route = 'home', pending = null;
+
+/* ---------- ikon ---------- */
+const ICON = {
+  plus: '<path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/>',
+  down: '<path d="M11 3h2v12h4l-5 6-5-6h4z"/>',
+  swap: '<path d="M7 4 3 8l4 4V9h9V7H7zm10 16 4-4-4-4v3H8v2h9z"/>',
+  mail: '<path d="M3 5h18v14H3zm2 2v.4l7 4.6 7-4.6V7l-7 4.6z"/>',
+  globe: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.6 0 3 2.7 3 8s-1.4 8-3 8-3-2.7-3-8 1.4-8 3-8zM4 11h16v2H4z"/>',
+  bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+  tv: '<path d="M3 6h18v12H3zm6 14h6v2H9zM8 2l4 3 4-3 1 1-3 2h-4L7 3z"/>',
+  shield: '<path d="M12 2 4 5v7c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5zm0 2.2 6 2.1V12c0 4-2.7 6.8-6 8-3.3-1.2-6-4-6-8V6.3z"/>',
+  chart: '<path d="M4 17h3l3-6 3 4 3-8 4 4v6H4zM4 20h16v2H4z"/>',
+  phone: '<path d="M7 2h10v20H7zm2 2v13h6V4zm2 15h2v1h-2z"/>',
+  doc: '<path d="M6 2h8l4 4v16H6zm7 1.5V7h3.5zM8 11h8v2H8zm0 4h8v2H8z"/>',
+  dots: '<circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/>',
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  receipt: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M8 8h8M8 12h8"/>',
+  qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M14 20h6"/>',
+  wallet: '<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="15" r="1.4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
 };
-$('#confirm').addEventListener('close',()=>{pending=null;});
-document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return;}const a=e.target.closest('[data-amount]');if(a){$('#amount').value=a.dataset.amount;return;}const s=e.target.closest('[data-service]');if(s){go('service:'+s.dataset.service);return;}const c=e.target.closest('[data-contact]');if(c){go('transfer');$('#target').value=c.dataset.contact;}});
-$('#clock').textContent=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});render();
+const svg = (name, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
+
+/* ---------- util ---------- */
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); return true; } catch { toast('Penyimpanan browser penuh.'); return false; } }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3000); }
+function go(to) { route = to; render(); window.scrollTo(0, 0); }
+const backBtn = '<button class="back-btn" data-go="home" aria-label="Kembali">←</button>';
+const page = (title, body) => `<section class="page"><header class="page-header">${backBtn}<h1>${title}</h1></header>${body}</section>`;
+
+/* ---------- komponen ---------- */
+function txList() {
+  if (!state.tx.length) return '<p class="empty">Belum ada transaksi.<br>Coba isi saldo dulu.</p>';
+  return state.tx.map((t) => `<div class="item"><span class="item-icon ${t.amount > 0 ? 'inc' : 'out'}">${t.amount > 0 ? '↓' : '↑'}</span><div class="meta"><strong>${esc(t.title)}</strong><small>${new Date(t.date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</small></div><span class="${t.amount > 0 ? 'positive' : 'negative'}">${t.amount > 0 ? '+' : '−'}${fmt(Math.abs(t.amount))}</span></div>`).join('');
+}
+
+function moneyForm(kind) {
+  const isTopup = kind === 'topup';
+  const targetField = isTopup
+    ? '<label>Sumber dana<select id="target"><option>Bank BCA (demo)</option><option>Bank Mandiri (demo)</option><option>Alfamart (demo)</option></select></label>'
+    : `<label>${kind === 'qris' ? 'Nama merchant' : 'Tujuan'}<input id="target" maxlength="40" required placeholder="${kind === 'qris' ? 'Warung Demo' : 'Nomor atau nama'}"></label>`;
+  return `<p class="notice">Simulasi. Tidak ada dana sungguhan yang berpindah.</p>
+  <form id="moneyForm" data-kind="${kind}">
+    ${targetField}
+    <label>Nominal (Rp)<input id="amount" type="number" inputmode="numeric" min="10000" max="10000000" step="1" required placeholder="Minimal 10.000"></label>
+    <div class="chips">${[10000, 50000, 100000, 500000].map((n) => `<button type="button" data-amount="${n}">${fmt(n)}</button>`).join('')}</div>
+    <p class="muted">Saldo: Rp ${fmt(state.balance)} · maks Rp10.000.000</p>
+    <p class="error" id="formError" role="alert"></p>
+    <button class="primary" type="submit">${isTopup ? 'Isi saldo' : kind === 'qris' ? 'Bayar' : 'Lanjutkan'}</button>
+  </form>`;
+}
+
+/* ---------- layar ---------- */
+function home() {
+  const services = [['KUA', 'globe'], ['PLN', 'bolt'], ['TV Kabel', 'tv'], ['Proteksi', 'shield'], ['Investasi', 'chart'], ['Pulsa', 'phone'], ['Pajak', 'doc'], ['Lainnya', 'dots']];
+  const contacts = ['+62345', '+62505', '+62433', '+62453'];
+  const promos = [['Promo Bulan ini', 'Ada QRIS, ada Solanapay, ada promo!'], ['Promo Online', 'Spesial beli pulsa dapat potongan ekstra'], ['Promo Terbatas', 'Raih Rp100 juta Solana Point modal topup'], ['Cashback', 'Staking saldo dan dapat cashback hingga 5%']];
+  return `<section class="hero"><div class="hero-bg">
+    <div class="hero-top">
+      <span class="avatar">${esc(state.name.slice(0, 1).toUpperCase())}</span>
+      <span class="greet">Selamat malam,<b>${esc(state.name)}</b></span>
+      <span class="brand">Solanapay</span>
+    </div>
+    <div class="balance-card"><div class="balance-inner">
+      <small>Total saldo anda</small>
+      <div class="money-row">
+        <span class="money-rp">Rp</span>
+        <span class="money-val" id="balanceValue">${state.hidden ? '••••••' : fmt(state.balance)}</span>
+        <button class="eye-btn" id="toggleEye" aria-label="${state.hidden ? 'Tampilkan' : 'Sembunyikan'} saldo">${state.hidden ? '◌' : '◉'}</button>
+      </div>
+      <span class="points">${fmt(state.points)} point</span>
+      <div style="clear:both"></div>
+      <div class="quick-actions">
+        <button class="qa" data-go="topup"><span class="qa-icon">${svg('plus')}</span>Isi saldo</button>
+        <button class="qa" data-go="request"><span class="qa-icon">${svg('down')}</span>Minta</button>
+        <button class="qa" data-go="transfer"><span class="qa-icon">${svg('swap')}</span>Kirim</button>
+        <button class="qa" data-go="messages"><span class="qa-icon">${svg('mail')}</span>Pesan</button>
+      </div>
+    </div></div>
+  </div></section>
+  <section class="services">${services.map(([n, i]) => `<button class="svc" data-service="${n}"><span class="svc-icon">${svg(i)}</span>${n}</button>`).join('')}</section>
+  <div class="contacts-strip">${contacts.map((c, i) => `<button class="contact-btn" data-contact="${c}"><span class="avatar">${'ADRM'[i]}</span>${c}</button>`).join('')}</div>
+  <section class="rekomendasi"><h2>Rekomendasi Pilihan</h2><div class="promo-scroll">${promos.map(([t, d]) => `<article class="promo-card"><div class="promo-img">${svg('bolt')}</div><p><strong style="font-size:13px">${t}</strong><br>${d}</p></article>`).join('')}</div></section>`;
+}
+
+const NAV = [['home', 'home', 'Beranda'], ['activity', 'receipt', 'Aktivitas'], ['qris', 'qr', ''], ['wallet', 'wallet', 'Dompet'], ['profile', 'user', 'Saya']];
+
+function render() {
+  $('#nav').innerHTML = NAV.map(([r, i, label]) => r === 'qris'
+    ? `<button data-go="qris" aria-label="Pindai QRIS"><span class="scan-ring">${svg(i)}</span></button>`
+    : `<button data-go="${r}" class="${r === route ? 'active' : ''}">${svg(i)}${label}</button>`).join('');
+
+  let html;
+  if (route === 'home') html = home();
+  else if (route === 'topup') html = page('Isi saldo', moneyForm('topup'));
+  else if (route === 'transfer') html = page('Kirim uang', moneyForm('transfer'));
+  else if (route === 'qris') html = page('Pindai QRIS', `<p class="notice">Pemindai kamera belum tersedia di demo ini. Masukkan merchant secara manual untuk simulasi pembayaran.</p>${moneyForm('qris')}`);
+  else if (route === 'activity') html = page('Aktivitas', `<p class="muted">${state.tx.length} transaksi</p>${txList()}`);
+  else if (route === 'wallet') html = page('Dompet', `<div class="balance-card" style="margin:0 0 18px"><div class="balance-inner"><small>Total saldo</small><div class="money-row"><span class="money-rp">Rp</span><span class="money-val">${fmt(state.balance)}</span></div></div></div><button class="listbtn" data-go="topup">Isi saldo <span>→</span></button><button class="listbtn" data-go="transfer">Kirim uang <span>→</span></button><button class="listbtn" data-go="activity">Riwayat <span>→</span></button>`);
+  else if (route === 'profile') html = page('Saya', `<div class="profile-card"><span class="avatar">${esc(state.name.slice(0, 1).toUpperCase())}</span><strong>${esc(state.name)}</strong></div><form id="profileForm"><label>Nama tampilan<input id="name" maxlength="24" required value="${esc(state.name)}"></label><button class="primary">Simpan</button></form><p class="notice">PIN demo <b>123456</b>. Data hanya tersimpan di browser ini.</p><button class="listbtn" id="resetBtn">Reset data demo <span>↺</span></button>`);
+  else if (route === 'request') html = page('Minta uang', `<p class="notice">Membuat teks permintaan. Tidak mengirim pesan otomatis.</p><form id="requestForm"><label>Nominal<input id="requestAmount" type="number" min="10000" max="10000000" required></label><button class="primary">Buat permintaan</button></form><p id="requestResult" class="muted"></p>`);
+  else if (route === 'messages') html = page('Pesan', `<p class="notice">Notifikasi transaksi demo.</p>${txList()}`);
+  else if (route.startsWith('service:')) {
+    const name = route.slice(8);
+    const billable = ['PLN', 'TV Kabel', 'Pulsa', 'Pajak'].includes(name);
+    html = page(esc(name), billable ? moneyForm('bill') : `<p class="notice">${esc(name)} belum terhubung layanan eksternal. Tidak ada pendaftaran, investasi, atau pembayaran sungguhan.</p><button class="primary" data-go="home">Kembali</button>`);
+  } else html = home();
+
+  $('#app').innerHTML = html;
+
+  $('#moneyForm')?.addEventListener('submit', prepare);
+  $('#profileForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const n = $('#name').value.trim();
+    if (!n) return;
+    state.name = n; save(); toast('Nama diperbarui'); go('profile');
+  });
+  $('#requestForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const amt = Number($('#requestAmount').value);
+    if (!Number.isSafeInteger(amt) || amt < 10000) { toast('Minimal Rp10.000'); return; }
+    $('#requestResult').textContent = `${state.name} meminta Rp ${fmt(amt)} (teks demo, belum dikirim).`;
+  });
+  $('#toggleEye')?.addEventListener('click', () => { state.hidden = !state.hidden; save(); render(); });
+  $('#resetBtn')?.addEventListener('click', () => {
+    if (window.confirm('Reset saldo dan hapus riwayat demo?')) { state = seed(); save(); go('home'); }
+  });
+}
+
+/* ---------- transaksi ---------- */
+function prepare(e) {
+  e.preventDefault();
+  const kind = e.target.dataset.kind;
+  const amount = Number($('#amount').value);
+  const target = ($('#target').value || '').trim();
+  const err = $('#formError');
+  if (!Number.isSafeInteger(amount) || amount < 10000 || amount > 10000000) { err.textContent = 'Nominal harus Rp10.000–Rp10.000.000.'; return; }
+  if (!target) { err.textContent = 'Tujuan wajib diisi.'; return; }
+  if (kind !== 'topup' && amount > state.balance) { err.textContent = 'Saldo tidak cukup.'; return; }
+  pending = { kind, amount, target, service: route.startsWith('service:') ? route.slice(8) : null };
+  $('#summary').textContent = `${kind === 'topup' ? 'Isi saldo' : kind === 'qris' ? 'Bayar' : 'Kirim'} Rp ${fmt(amount)} ke ${target}`;
+  $('#pin').value = ''; $('#pinError').textContent = '';
+  $('#confirm').showModal();
+  $('#pin').focus();
+}
+
+$('#approve').addEventListener('click', () => {
+  if (!pending) return;
+  if ($('#pin').value !== '123456') { $('#pinError').textContent = 'PIN salah. Gunakan 123456.'; return; }
+  const p = pending;
+  if (p.kind !== 'topup' && p.amount > state.balance) { $('#pinError').textContent = 'Saldo tidak cukup.'; return; }
+  const title = p.kind === 'topup' ? `Isi saldo · ${p.target}` : p.kind === 'qris' ? `QRIS · ${p.target}` : p.kind === 'bill' ? `${p.service} · ${p.target}` : `Kirim · ${p.target}`;
+  const signed = p.kind === 'topup' ? p.amount : -p.amount;
+  state.balance += signed;
+  state.tx.unshift({ id: String(Date.now()) + Math.random(), title, amount: signed, date: new Date().toISOString() });
+  state.tx = state.tx.slice(0, 200);
+  save();
+  pending = null;
+  $('#confirm').close();
+  $('#app').innerHTML = page('Berhasil', `<div class="success"><div class="check">✓</div><p class="big">Rp ${fmt(p.amount)}</p><p>${esc(title)}</p><p class="muted">Simulasi selesai. Tidak ada uang sungguhan berpindah.</p><button class="primary" data-go="activity">Lihat aktivitas</button></div>`);
+  window.scrollTo(0, 0);
+});
+
+$('#confirm').addEventListener('close', () => { pending = null; });
+
+document.addEventListener('click', (e) => {
+  const g = e.target.closest('[data-go]');
+  if (g) { go(g.dataset.go); return; }
+  const a = e.target.closest('[data-amount]');
+  if (a) { $('#amount').value = a.dataset.amount; return; }
+  const s = e.target.closest('[data-service]');
+  if (s) { go('service:' + s.dataset.service); return; }
+  const c = e.target.closest('[data-contact]');
+  if (c) { go('transfer'); const t = $('#target'); if (t) t.value = c.dataset.contact; }
+});
+
+render();
