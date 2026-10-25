@@ -212,6 +212,25 @@ document.addEventListener('click', (e) => {
   if (c) { go('transfer'); const t = $('#target'); if (t) t.value = c.dataset.contact; }
 });
 
+/* ---------- banner promo: autoplay, tetap bisa swipe manual ---------- */
+let bannerPauseUntil = 0;
+for (const event of ['pointerdown', 'wheel', 'focusin']) {
+  document.addEventListener(event, (e) => {
+    if (e.target.closest('.banner-scroll')) bannerPauseUntil = Date.now() + 8000;
+  }, { passive: true });
+}
+setInterval(() => {
+  const track = $('.banner-scroll');
+  if (!track || document.hidden || $('#shell').hidden || Date.now() < bannerPauseUntil || track.matches(':hover') || track.contains(document.activeElement)) return;
+  const slides = [...track.children];
+  if (slides.length < 2) return;
+  const start = slides[0].offsetLeft;
+  const positions = slides.map(slide => slide.offsetLeft - start);
+  const current = positions.reduce((best, pos, i) => Math.abs(pos - track.scrollLeft) < Math.abs(positions[best] - track.scrollLeft) ? i : best, 0);
+  const next = (current + 1) % slides.length;
+  track.scrollTo({ left: positions[next], behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+}, 4000);
+
 /* ================= boot: splash -> PIN -> aplikasi ================= */
 const DEMO_PIN = '123456';
 let pinBuf = '';
