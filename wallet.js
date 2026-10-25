@@ -87,6 +87,39 @@ function moneyForm(kind) {
   </form>`;
 }
 
+/* ---------- katalog layanan dan detail rekomendasi ---------- */
+const EXTRA_SERVICES = ['Deals', 'Saldo Pengemudi Grab', 'BPJS', 'E-Samsat', 'Air PDAM', 'Pendidikan', 'E-Tilang', 'Streaming'];
+const SERVICE_OPTIONS = {
+  PLN: ['Token listrik', 'Tagihan listrik'],
+  'TV Kabel': ['Biznet Home', 'Centtrin Online', 'MNC Play', 'Transvision', 'Top TV', 'MNC Vision', 'K Vision', 'Indovision'],
+  Pulsa: ['Telkomsel', 'Indosat', 'XL', 'Tri'],
+  Pajak: ['Pajak wilayah', 'E-Samsat'],
+  BPJS: ['BPJS Kesehatan', 'BPJS Ketenagakerjaan'],
+  Streaming: ['Voucher streaming'],
+};
+const PROMO_DETAILS = [
+  ['Super Promo', 'Program promosi berisi informasi diskon, cashback, dan penawaran khusus dari berbagai produk dan layanan.', 'topup', 'Coba isi saldo'],
+  ['Great Offers', 'Penawaran spesial berupa diskon, cashback, voucher belanja, dan penawaran eksklusif produk serta layanan.', 'service:Deals', 'Lihat Deals'],
+  ['Pre order', 'Informasi pre-order iPhone 17 Pro: periode pemesanan, manfaat eksklusif, dan ketentuan pemesanan. Desain belum menyertakan tanggal, harga, atau syarat lengkap.', null, null],
+  ['Lucky Wash', 'Informasi promo pembelian mesin cuci dengan voucher e-wallet. Nilai voucher, periode, dan ketentuan lengkap belum dicantumkan dalam desain.', null, null],
+];
+function serviceScreen(name) {
+  if (name === 'Lainnya') return page('Lainnya', `<p class="muted">Pilih layanan</p>${EXTRA_SERVICES.map(n => `<button class="listbtn" data-service="${n}">${esc(n)} <span>→</span></button>`).join('')}`);
+  if (name === 'Deals') return page('Deals', PROMO_DETAILS.map(([title], i) => `<button class="listbtn" data-go="promo:${i}">${title} <span>→</span></button>`).join(''));
+  if (name === 'Investasi' || name === 'Proteksi' || name === 'KUA') {
+    const choices = name === 'Investasi' ? ['Crypto', 'Saham luar', 'Solpay', 'Gold'] : name === 'Proteksi' ? ['BPJS Kesehatan', 'BPJS Ketenagakerjaan'] : [];
+    return page(esc(name), `<p class="notice">Katalog demo, belum terhubung layanan eksternal. Tidak ada pendaftaran atau pembelian produk sungguhan.</p>${choices.map(n => `<div class="item"><div class="meta"><strong>${esc(n)}</strong><small>Informasi produk · belum tersedia untuk transaksi</small></div></div>`).join('')}`);
+  }
+  const options = SERVICE_OPTIONS[name] || [name];
+  return page(esc(name), `<p class="notice">Simulasi pembayaran ${esc(name)}. Nominal diisi sendiri untuk demo; tidak ada pengecekan tagihan atau produk yang dikirim.</p><label>Pilih layanan / penyedia<select id="provider">${options.map(n => `<option>${esc(n)}</option>`).join('')}</select></label>${moneyForm('bill')}`);
+}
+function promoScreen(index) {
+  const promo = PROMO_DETAILS[index];
+  if (!promo) return page('Rekomendasi', '<p class="empty">Penawaran tidak ditemukan.</p>');
+  const [title, description, destination, label] = promo;
+  return page(title, `<img class="promo-detail-image" src="${IMG.promos[index]}" alt="${esc(title)}"><p class="promo-description">${esc(description)}</p><p class="notice">Informasi mengikuti desain Figma. Demo saja, bukan promo aktif atau jaminan hadiah.</p>${destination ? `<button class="primary" data-go="${destination}">${label}</button>` : '<button class="primary" data-go="home">Kembali ke beranda</button>'}`);
+}
+
 /* ---------- layar ---------- */
 function home() {
   const services = [['KUA', 'globe'], ['PLN', 'bolt'], ['TV Kabel', 'tv'], ['Proteksi', 'shield'], ['Investasi', 'chart'], ['Pulsa', 'phone'], ['Pajak', 'doc'], ['Lainnya', 'dots']];
@@ -118,7 +151,7 @@ function home() {
   <section class="services">${services.map(([n, i]) => `<button class="svc" data-service="${n}"><span class="svc-icon">${svg(i)}</span>${n}</button>`).join('')}</section>
   <div class="contacts-strip">${contacts.map((c, i) => `<button class="contact-btn" data-contact="${c}"><span class="avatar"><img src="${IMG.avatars[i]}" alt="" width="38" height="38"></span>${c}</button>`).join('')}</div>
   <div class="banner-scroll">${IMG.banners.map((b, i) => `<img class="banner-img" src="${b}" alt="Banner promo ${i + 1}" width="362" height="181" loading="lazy">`).join('')}</div>
-  <section class="rekomendasi"><h2>Rekomendasi Pilihan</h2><div class="promo-scroll">${promos.map(([t, d], i) => `<article class="promo-card"><img class="promo-img" src="${IMG.promos[i]}" alt="" width="154" height="104" loading="lazy"><p><strong style="font-size:13px">${t}</strong><br>${d}</p></article>`).join('')}</div></section>`;
+  <section class="rekomendasi"><h2>Rekomendasi Pilihan</h2><div class="promo-scroll">${promos.map(([t, d], i) => `<button type="button" class="promo-card" data-go="promo:${i}" aria-label="Lihat ${PROMO_DETAILS[i][0]}"><img class="promo-img" src="${IMG.promos[i]}" alt="" width="154" height="104" loading="lazy"><p><strong style="font-size:13px">${PROMO_DETAILS[i][0]}</strong><br>${d}</p></button>`).join('')}</div></section>`;
 }
 
 const NAV = [['home', 'home', 'Beranda'], ['activity', 'receipt', 'Aktivitas'], ['qris', 'qr', ''], ['wallet', 'wallet', 'Dompet'], ['profile', 'user', 'Saya']];
@@ -138,11 +171,9 @@ function render() {
   else if (route === 'profile') html = page('Saya', `<div class="profile-card"><span class="avatar">${esc(state.name.slice(0, 1).toUpperCase())}</span><strong>${esc(state.name)}</strong></div><form id="profileForm"><label>Nama tampilan<input id="name" maxlength="24" required value="${esc(state.name)}"></label><button class="primary">Simpan</button></form><p class="notice">PIN demo <b>123456</b>. Data hanya tersimpan di browser ini.</p><button class="listbtn" id="resetBtn">Reset data demo <span>↺</span></button>`);
   else if (route === 'request') html = page('Minta uang', `<p class="notice">Membuat teks permintaan. Tidak mengirim pesan otomatis.</p><form id="requestForm"><label>Nominal<input id="requestAmount" type="number" min="10000" max="10000000" required></label><button class="primary">Buat permintaan</button></form><p id="requestResult" class="muted"></p>`);
   else if (route === 'messages') html = page('Pesan', `<p class="notice">Notifikasi transaksi demo.</p>${txList()}`);
-  else if (route.startsWith('service:')) {
-    const name = route.slice(8);
-    const billable = ['PLN', 'TV Kabel', 'Pulsa', 'Pajak'].includes(name);
-    html = page(esc(name), billable ? moneyForm('bill') : `<p class="notice">${esc(name)} belum terhubung layanan eksternal. Tidak ada pendaftaran, investasi, atau pembayaran sungguhan.</p><button class="primary" data-go="home">Kembali</button>`);
-  } else html = home();
+  else if (route.startsWith('service:')) html = serviceScreen(route.slice(8));
+  else if (route.startsWith('promo:')) html = promoScreen(Number(route.slice(6)));
+  else html = home();
 
   $('#app').innerHTML = html;
 
@@ -170,7 +201,9 @@ function prepare(e) {
   e.preventDefault();
   const kind = e.target.dataset.kind;
   const amount = Number($('#amount').value);
-  const target = ($('#target').value || '').trim();
+  const account = ($('#target').value || '').trim();
+  const provider = $('#provider')?.value;
+  const target = account ? (provider ? `${provider} · ${account}` : account) : '';
   const err = $('#formError');
   if (!Number.isSafeInteger(amount) || amount < 10000 || amount > 10000000) { err.textContent = 'Nominal harus Rp10.000–Rp10.000.000.'; return; }
   if (!target) { err.textContent = 'Tujuan wajib diisi.'; return; }

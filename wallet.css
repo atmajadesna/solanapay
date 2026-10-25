@@ -39,6 +39,10 @@ main{padding-bottom:110px}
 .promo-card{flex:0 0 154px;scroll-snap-align:start;border-radius:10px;overflow:hidden;background:#f3f0ff;box-shadow:0 2px 8px #0000000f}
 .promo-img{width:154px;height:104px;object-fit:cover;display:block;background:#e7e2fb}
 .promo-card p{padding:10px;font-size:13px;line-height:1.4;font-weight:500}
+button.promo-card{text-align:left;color:inherit;font-family:inherit;border:0;cursor:pointer;padding:0}
+.promo-card:focus-visible{outline:3px solid #8274EA;outline-offset:2px}
+.promo-detail-image{width:100%;height:auto;max-height:260px;object-fit:contain;border-radius:12px;background:#f3f0ff;margin-bottom:18px}
+.promo-description{font-size:14px;line-height:1.8;margin-bottom:20px}
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:402px;background:#fff;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -3px 12px #00000014;padding:8px 0 max(12px,env(safe-area-inset-bottom));z-index:10}
 nav button{background:0 0;font-size:10px;color:#888;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0}
 nav button svg{width:24px;height:24px;fill:none;stroke:#888;stroke-width:1.9}
