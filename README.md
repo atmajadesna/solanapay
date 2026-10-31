@@ -1,29 +1,38 @@
-# Solanapay — aplikasi dompet digital (demo)
+# Solanapay
 
-Implementasi HTML/CSS/JavaScript, bukan gambar dengan hotspot. Home mengikuti komposisi frame Figma: header biru, kartu ungu, layanan 4 kolom dan navigasi 5 menu. Halaman fungsional lanjutan diadaptasi, belum mereplikasi seluruh 154 frame.
+A mobile-first virtual-wallet prototype built with HTML, CSS, and JavaScript. The home composition preserves the supplied Figma design: blue header, purple balance card, four-column services, and five-item navigation. Supporting screens are adaptations, not a complete reproduction of all design frames.
 
-## Jalankan
+[Open demo](https://atmajadesna.github.io/solanapay/)
+
+## Run locally
+
 ```bash
 python3 -m http.server 8099 --bind 127.0.0.1
 ```
-Buka http://127.0.0.1:8099.
 
-Demo live: https://atmajadesna.github.io/solanapay/
+Open `http://127.0.0.1:8099`.
 
-## Fitur
-- Isi saldo virtual, kirim uang virtual dan pembayaran merchant demo.
-- Validasi nominal bulat Rp10.000–Rp10.000.000 dan saldo mencukupi.
-- Konfirmasi PIN demo **123456**; batal tidak mengubah saldo.
-- Aktivitas transaksi, saldo dan nama tersimpan di localStorage.
-- Sembunyikan saldo, edit nama, reset demo dengan konfirmasi.
-- Buat teks permintaan uang tanpa mengirim pesan otomatis.
-- Simulasi tagihan PLN, TV kabel, pulsa dan pajak.
+## Features
 
-## Batasan
-Tidak ada uang asli, bank, QR scanner, blockchain, backend, autentikasi sungguhan, investasi atau pembayaran tagihan nyata. PIN client-side bukan fitur keamanan produksi. Data browser dapat diubah lewat DevTools. Jangan memasukkan data asli. Layanan yang belum terhubung ditandai jelas.
+- Virtual top-ups, transfers, and manually entered merchant payments.
+- Integer amount validation and insufficient-balance checks.
+- Demo PIN confirmation, cancellation, and local transaction history.
+- Local balance visibility and display-name settings.
+- Request-text generation without sending messages.
+- Clearly labeled simulated utility bills and service catalogs.
 
-## File aktif
-index.html, wallet.css, wallet.js. File prototype dan ekspor Figma lama dipertahankan sebagai referensi, tidak dimuat aplikasi.
+## Limitations
 
-## Tes
-Chromium: topup, PIN salah, transfer, pembatalan, riwayat, persistensi setelah reload, mobile 360px tanpa overflow dan tanpa JS error.
+No real funds, banking, QR camera scanning, blockchain, server authentication, investments, or actual bill payments. The client-side demo PIN is not a security control. Browser data can be edited with developer tools. Use fictional information only. Promotional artwork is reference content, not an active offer or affiliation guarantee.
+
+## Files and verification
+
+`index.html`, `wallet.css`, and `wallet.js` are active. Earlier prototype files and design exports remain reference-only.
+
+```bash
+node --check wallet.js
+# With Playwright installed and Chromium configured:
+node tests/ui.cjs
+```
+
+Browser checks cover virtual top-up, wrong confirmation PIN, cancellation without balance changes, runtime errors, and five viewport widths. Fonts load from Google Fonts. Publication of source and deployment are verified separately.
